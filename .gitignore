@@ -1,5 +1,5 @@
 .claude/
-vault/dist/
-vault/node_modules/
-vault/release/
+dist/
+node_modules/
+vault/
 vault.rar
