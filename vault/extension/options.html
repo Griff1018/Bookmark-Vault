@@ -1,0 +1,21 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Vault Bookmarker Settings</title>
+  <style>
+    body { font-family: -apple-system, sans-serif; background: #141311; color: #ece6da; padding: 20px; width: 280px; }
+    label { font-size: 12px; color: #948c7c; display: block; margin-bottom: 6px; }
+    input { width: 100%; box-sizing: border-box; padding: 8px; background: #221f1c; border: 1px solid #2c2822; color: #ece6da; border-radius: 6px; margin-bottom: 10px; }
+    button { padding: 8px 12px; background: #c9974d; border: none; border-radius: 6px; color: #1c1508; font-weight: 600; cursor: pointer; }
+    p { font-size: 11px; color: #625b4e; }
+  </style>
+</head>
+<body>
+  <label for="token">Pairing token (optional)</label>
+  <input id="token" placeholder="Leave blank if unused" />
+  <button id="save">Save</button>
+  <p>Only needed if you set a token in the Vault app's settings. The bridge listens on 127.0.0.1:47564 — the app must be running to receive bookmarks.</p>
+  <script src="options.js"></script>
+</body>
+</html>

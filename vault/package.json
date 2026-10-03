@@ -1,0 +1,55 @@
+{
+  "name": "vault",
+  "version": "0.1.0",
+  "description": "Local-first bookmark manager with a browser extension bridge",
+  "private": true,
+  "main": "electron/main.js",
+  "scripts": {
+    "dev": "concurrently -k \"vite\" \"wait-on tcp:5173 && electron .\"",
+    "build": "vite build",
+    "start": "electron .",
+    "postinstall": "electron-builder install-app-deps",
+    "dist": "vite build && electron-builder"
+  },
+  "dependencies": {
+    "better-sqlite3": "^11.3.0",
+    "decode-ico": "^0.4.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.7.0",
+    "concurrently": "^9.0.1",
+    "electron": "^32.1.2",
+    "electron-builder": "^25.0.5",
+    "vite": "^5.4.21",
+    "wait-on": "^8.0.1"
+  },
+  "author": "Vault",
+  "build": {
+    "appId": "com.local.vault",
+    "productName": "Vault",
+    "directories": {
+      "output": "release"
+    },
+    "asarUnpack": [
+      "**/*.node"
+    ],
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "mac": {
+      "target": "dmg"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
+  }
+}
