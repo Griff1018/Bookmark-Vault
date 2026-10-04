@@ -412,6 +412,11 @@ const queries = {
     return true;
   },
 
+  itemsByIds(ids) {
+    const get = db.prepare('SELECT * FROM items WHERE id = ?');
+    return (ids || []).map((id) => get.get(id)).filter(Boolean);
+  },
+
   itemsMissingThumbnail(folderId) {
     const folderIds = folderId != null ? collectFolderAndDescendants(folderId) : null;
     console.log('[Vault:db] itemsMissingThumbnail folderId:', folderId, 'folderIds:', folderIds ? [...folderIds] : null);

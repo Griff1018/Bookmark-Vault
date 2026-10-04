@@ -15,7 +15,7 @@ contextBridge.exposeInMainWorld('vault', {
   deleteFolder: (id) => ipcRenderer.invoke('folders:delete', id),
   toggleFolderBlur: (id) => ipcRenderer.invoke('folders:toggleBlur', id),
   matchingFolderIds: (filter) => ipcRenderer.invoke('folders:matching', filter),
-  retryThumbnails: (folderId) => ipcRenderer.invoke('items:retryThumbnails', folderId),
+  retryThumbnails: (folderId, itemIds) => ipcRenderer.invoke('items:retryThumbnails', folderId, itemIds),
   getSetting: (key, fallback) => ipcRenderer.invoke('settings:get', key, fallback),
   setSetting: (key, value) => ipcRenderer.invoke('settings:set', { key, value }),
   openExternal: (url) => ipcRenderer.invoke('shell:openExternal', url),

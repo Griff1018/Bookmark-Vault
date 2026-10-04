@@ -558,6 +558,22 @@ export default function App() {
     refresh();
   }
 
+  async function retryItemThumbnail(item) {
+    const result = await window.vault.retryThumbnails(null, [item.id]);
+    showToast(result.succeeded > 0 ? 'Thumbnail loaded' : 'Could not load a thumbnail — see progress');
+    refresh();
+  }
+
+  async function openInIncognito(item) {
+    const result = await window.vault.openIncognito(item.url);
+    if (!result || !result.ok) {
+      window.alert(
+        (result && result.error) ||
+        'Could not open an incognito window. Set a browser path in Settings if auto-detection failed.'
+      );
+    }
+  }
+
   function buildFolderMenuItems(folder) {
     return [
       { label: 'New subfolder', onClick: () => startCreateFolder(folder.id) },
@@ -655,18 +671,10 @@ export default function App() {
     return [
       { label: 'Open details', onClick: () => handleOpenItem(item) },
       { label: 'Open link in browser', onClick: () => { window.vault.openExternal(item.url); showToast('Opened in browser'); } },
-      {
-        label: 'Open link in Incognito',
-        onClick: async () => {
-          const result = await window.vault.openIncognito(item.url);
-          if (!result || !result.ok) {
-            window.alert(
-              (result && result.error) ||
-              'Could not open an incognito window. Set a browser path in Settings if auto-detection failed.'
-            );
-          }
-        }
-      },
+      { label: 'Open link in Incognito', onClick: () => openInIncognito(item) },
+      ...(!item.thumbnail_path || item.has_pending_thumbnail
+        ? [{ label: 'Load thumbnail', onClick: () => retryItemThumbnail(item) }]
+        : []),
       { separator: true },
       { label: 'Favorite', checked: !!item.favorite, onClick: () => toggleFavorite(item) },
       { label: 'Tags', submenu: tagSubmenu },
@@ -712,12 +720,6 @@ export default function App() {
         onQuery={setQuery}
         view={view}
         onView={(v) => { setView(v); setActiveSource(null); setActiveTag(null); setActiveFolder(null); }}
-        sources={sources}
-        activeSource={activeSource}
-        onSource={(s) => { setActiveSource(s); setView('all'); }}
-        tags={tags}
-        activeTag={activeTag}
-        onTag={(t) => { setActiveTag(t); setView('all'); }}
         stats={stats}
         folderTree={folderTree}
         activeFolder={activeFolder}
@@ -748,6 +750,13 @@ export default function App() {
         onToggleFavorite={toggleFavorite}
         sort={sort}
         onSort={setSort}
+        tags={tags}
+        sources={sources}
+        activeTag={activeTag}
+        activeSource={activeSource}
+        onTag={(t) => { setActiveTag(t); setView('all'); }}
+        onSource={(src) => { setActiveSource(src); setView('all'); }}
+        onReload={refresh}
         title={panelTitle}
         view={galleryView}
         onViewChange={setGalleryView}
@@ -783,6 +792,8 @@ export default function App() {
             onUpdate={handleUpdate}
             onDelete={handleDelete}
             onOpenExternal={(url) => window.vault.openExternal(url)}
+            onOpenIncognito={() => openInIncognito(openItem)}
+            onLoadThumbnail={() => retryItemThumbnail(openItem)}
             onToast={showToast}
           />
         </>

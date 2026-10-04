@@ -69,12 +69,12 @@ app.whenReady().then(() => {
   });
   ipcMain.handle('settings:get', (_e, key, fallback) => db.getSetting(key, fallback));
   ipcMain.handle('settings:set', (_e, { key, value }) => db.setSetting(key, value));
-  ipcMain.handle('items:retryThumbnails', async (_e, folderId) => {
+  ipcMain.handle('items:retryThumbnails', async (_e, folderId, itemIds) => {
     const emit = (evt) => { if (mainWindow) mainWindow.webContents.send('progress:event', { ts: Date.now(), ...evt }); };
     const kb = (n) => `${(n / 1024).toFixed(n < 10240 ? 1 : 0)} KB`;
-    const items = db.itemsMissingThumbnail(folderId);
+    const items = Array.isArray(itemIds) ? db.itemsByIds(itemIds) : db.itemsMissingThumbnail(folderId);
     const batchId = `batch-${Date.now()}`;
-    emit({ type: 'job', jobId: batchId, kind: 'batch', title: 'Load failed thumbnails', total: items.length });
+    emit({ type: 'job', jobId: batchId, kind: 'batch', title: Array.isArray(itemIds) ? 'Load thumbnail' : 'Load failed thumbnails', total: items.length });
     if (items.length === 0) {
       emit({ type: 'end', jobId: batchId, ok: true, summary: 'nothing to fetch' });
       return { retried: 0, succeeded: 0 };

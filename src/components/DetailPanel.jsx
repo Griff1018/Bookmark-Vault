@@ -18,7 +18,7 @@ function formatDate(ts) {
   return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
 }
 
-export default function DetailPanel({ item, onClose, onUpdate, onDelete, onOpenExternal, onToast }) {
+export default function DetailPanel({ item, onClose, onUpdate, onDelete, onOpenExternal, onOpenIncognito, onLoadThumbnail, onToast }) {
   const [title, setTitle] = useState(item.title || '');
   const [notes, setNotes] = useState(item.notes || '');
   const [tagInput, setTagInput] = useState('');
@@ -89,6 +89,9 @@ export default function DetailPanel({ item, onClose, onUpdate, onDelete, onOpenE
             ) : (
               <div className="detail-no-thumb">No thumbnail</div>
             )}
+            {(!item.thumbnail_path || item.has_pending_thumbnail) && (
+              <button className="btn detail-load-thumb" onClick={onLoadThumbnail}>Load thumbnail</button>
+            )}
           </div>
           {dims && <span className="detail-dim-tag">[{dims}]</span>}
         </figure>
@@ -109,6 +112,9 @@ export default function DetailPanel({ item, onClose, onUpdate, onDelete, onOpenE
               onClick={() => commit({ favorite: item.favorite ? 0 : 1 })}
               title={item.favorite ? 'Remove from favorites' : 'Add to favorites'}
             >♥</button>
+            <button className="btn incognito" onClick={onOpenIncognito} title="Open link in incognito">
+              <svg viewBox="0 0 16 16" width="15" height="15" fill="currentColor"><path d="M2 8.5h12v1H2zM4 8.5l.9-4.2c.1-.5.6-.8 1.1-.6L8 4.5l2-.8c.5-.2 1 .1 1.1.6l.9 4.2z"/><circle cx="5" cy="12" r="2" fill="none" stroke="currentColor" strokeWidth="1.2"/><circle cx="11" cy="12" r="2" fill="none" stroke="currentColor" strokeWidth="1.2"/><path d="M7 12h2" stroke="currentColor" strokeWidth="1.2"/></svg>
+            </button>
             <button className="btn primary" onClick={() => onOpenExternal(item.url)}>Open link</button>
             <button className="btn danger" onClick={() => onDelete(item.id)}>Delete</button>
           </div>

@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import FilterBar from './FilterBar.jsx';
 import ViewToolbar from './ViewToolbar.jsx';
 import DetailsTable from './DetailsTable.jsx';
 import TiledRows from './TiledRows.jsx';
@@ -28,8 +29,15 @@ export default function Gallery({
   blurredFolderIds, activeFolder,
   cardSize, onCardSizeChange,
   selectedIds, onSelectItem,
-  focusedIndex
+  focusedIndex,
+  tags, sources, activeTag, activeSource, onTag, onSource, onReload
 }) {
+  const [reloading, setReloading] = useState(false);
+  async function handleReload() {
+    setReloading(true);
+    try { await onReload(); } finally { setTimeout(() => setReloading(false), 400); }
+  }
+
   const gridClass = view === 'small' ? 'grid grid-small' : 'grid';
   const isSearching = searchQuery && searchQuery.trim().length > 0;
   const isAllItems = !activeFolder && !isSearching;
@@ -63,12 +71,10 @@ export default function Gallery({
               + Folder
             </button>
           )}
+          <button className={`reload-btn ${reloading ? 'spinning' : ''}`} onClick={handleReload} title="Reload">
+            <svg viewBox="0 0 16 16" width="15" height="15" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><path d="M13.5 8a5.5 5.5 0 1 1-1.8-4.1"/><path d="M13.5 2.5v3h-3"/></svg>
+          </button>
           <ViewToolbar view={view} onChange={onViewChange} />
-          <select className="sort-select" value={sort} onChange={(e) => onSort(e.target.value)}>
-            <option value="newest">Newest first</option>
-            <option value="oldest">Oldest first</option>
-            <option value="title">Title A–Z</option>
-          </select>
           {(view === 'large' || view === 'small' || view === 'rows') && (
             <div className="size-slider" title={`Card size: ${cardSize}px`}>
               <span className="size-slider-icon size-slider-icon--small">▪</span>
@@ -85,6 +91,13 @@ export default function Gallery({
           )}
         </div>
       </div>
+
+      <FilterBar
+        tags={tags || []} sources={sources || []}
+        activeTag={activeTag} activeSource={activeSource}
+        onTag={onTag} onSource={onSource}
+        sort={sort} onSort={onSort}
+      />
 
       <div className="gallery">
         {isSearching && searchFacets && (

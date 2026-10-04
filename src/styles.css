@@ -604,7 +604,7 @@ select.sort-select { font-family: var(--mono); font-size: 10.5px; letter-spacing
 .theme-card { display: flex; flex-direction: column; gap: 6px; padding: 6px; border: 1px solid var(--border-strong); background: transparent; cursor: pointer; text-align: left; font: 600 10px var(--mono); letter-spacing: .06em; text-transform: uppercase; color: var(--text-muted); }
 .theme-card:hover { border-color: var(--accent); }
 .theme-card.active { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); color: var(--accent); }
-.theme-swatch { height: 46px; display: grid; grid-template-columns: 1fr 14px; border: 1px solid rgba(128,128,128,.35); }
+.theme-swatch { height: 46px; display: grid; grid-template-columns: 1fr 1fr; border: 1px solid var(--border-strong); }
 .theme-swatch i { display: block; }
 .settings-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
 .settings-row-label { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
@@ -623,3 +623,39 @@ select.sort-select { font-family: var(--mono); font-size: 10.5px; letter-spacing
 .settings-range .mono-val { min-width: 52px; text-align: right; font: 600 11px var(--mono); color: var(--accent); }
 .settings-text { width: 100%; background: var(--surface); border: 1px solid var(--border-strong); padding: 8px 10px; font: 12px var(--mono); outline: none; }
 .settings-text:focus { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+
+/* Detail: incognito + load-thumbnail buttons */
+.detail-toolbar .btn.incognito { flex: 0 0 38px; padding: 0; display: grid; place-items: center; }
+.detail-thumb-area { position: relative; }
+.detail-load-thumb { position: absolute; left: 50%; bottom: 8px; transform: translateX(-50%); }
+
+/* Reload button */
+.reload-btn { width: 34px; height: 34px; display: grid; place-items: center; border: 1px solid var(--border-strong); background: var(--surface); color: var(--text-muted); cursor: pointer; }
+.reload-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+.reload-btn.spinning svg { animation: spin .6s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Filter bar */
+.filter-bar { display: flex; align-items: center; gap: 8px; padding: 10px 30px; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
+.fb-wrap { position: relative; }
+.fb-btn { height: 32px; display: flex; align-items: center; gap: 7px; padding: 0 12px; border: 1px solid var(--border-strong); background: var(--surface); color: var(--text-muted); font: 600 11px var(--mono); letter-spacing: .04em; cursor: pointer; }
+.fb-btn:hover { border-color: var(--accent); color: var(--text); }
+.fb-btn.active { border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+.fb-icon { opacity: .8; }
+.fb-caret { font-size: 9px; opacity: .6; }
+.fb-clear { margin-left: 2px; padding: 0 2px; font-size: 10px; opacity: .7; }
+.fb-clear:hover { opacity: 1; }
+.fb-sep { width: 1px; height: 20px; background: var(--border-strong); margin: 0 4px; }
+.fb-pop { position: absolute; z-index: 60; top: calc(100% + 4px); left: 0; width: 260px; background: var(--surface); border: 1px solid var(--accent); box-shadow: var(--shadow-lg); animation: menuIn .13s ease; }
+.fb-pop.right { left: auto; right: 0; width: 200px; }
+.fb-search { width: 100%; border: 0; border-bottom: 1px solid var(--border); padding: 9px 11px; background: transparent; font: 12px var(--mono); outline: 0; }
+.fb-list { max-height: 280px; overflow-y: auto; padding: 4px; }
+.fb-item { display: flex; align-items: center; gap: 8px; padding: 7px 8px; font-size: 12px; cursor: pointer; }
+.fb-item:hover { background: var(--accent); color: var(--on-accent); }
+.fb-item.active { color: var(--accent); font-weight: 700; }
+.fb-item:hover .fb-count, .fb-item:hover .fb-check { color: var(--on-accent); }
+.fb-check { width: 12px; color: var(--accent); }
+.fb-item-label { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fb-count { font: 10px var(--mono); color: var(--text-faint); }
+.fb-empty { padding: 10px; color: var(--text-faint); font-size: 11.5px; }
+@media (max-width: 900px) { .filter-bar { padding-left: 20px; padding-right: 20px; } }

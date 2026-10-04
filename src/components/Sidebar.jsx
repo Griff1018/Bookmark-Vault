@@ -4,8 +4,6 @@ import FolderTree from './FolderTree.jsx';
 export default function Sidebar({
   query, onQuery,
   view, onView,
-  sources, activeSource, onSource,
-  tags, activeTag, onTag,
   stats,
   folderTree, activeFolder, onSelectFolder, onFolderContextMenu,
   expandedFolders, onToggleExpandFolder,
@@ -82,41 +80,6 @@ export default function Sidebar({
           onDragLeaveFolder={onDragLeaveFolder}
           onDragStartFolder={onDragStartFolder}
         />
-      </div>
-
-      <div className="nav-section">
-        <h4>Sources</h4>
-        <div className="nav-list">
-          {sources.length === 0 && <div className="nav-row" style={{ color: 'var(--text-faint)' }}>None yet</div>}
-          {sources.map((s) => (
-            <div
-              key={s.source}
-              className={`nav-row ${activeSource === s.source ? 'active' : ''}`}
-              onClick={() => onSource(activeSource === s.source ? null : s.source)}
-              title={s.source}
-            >
-              <span>{s.source}</span>
-              <span className="count">{s.count}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="nav-section">
-        <h4>Tags</h4>
-        <div className="nav-list">
-          {tags.length === 0 && <div className="nav-row" style={{ color: 'var(--text-faint)' }}>None yet</div>}
-          {tags.map((t) => (
-            <div
-              key={t.name}
-              className={`nav-row ${activeTag === t.name ? 'active' : ''}`}
-              onClick={() => onTag(activeTag === t.name ? null : t.name)}
-            >
-              <span>#{t.name}</span>
-              <span className="count">{t.count}</span>
-            </div>
-          ))}
-        </div>
       </div>
 
       <div className="sidebar-footer">

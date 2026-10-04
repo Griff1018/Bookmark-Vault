@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 
-// swatch = [paper, ink]
+// swatch = [paper, ink]: two solid blocks per theme
 const THEMES = [
-  { id: 'blueprint', label: 'Blueprint', swatch: ['#f6f6f8', '#1f2bff'] },
-  { id: 'blueprint-dark', label: 'Blueprint Dark', swatch: ['#0e0e10', '#4d6bff'] },
+  { id: 'blueprint', label: 'Blueprint', swatch: ['#ffffff', '#1f2bff'] },
+  { id: 'blueprint-dark', label: 'Blueprint Dark', swatch: ['#000000', '#4d6bff'] },
   { id: 'white', label: 'White', swatch: ['#ffffff', '#111111'] },
   { id: 'black', label: 'Black', swatch: ['#000000', '#f2f2f2'] }
 ];
@@ -63,8 +63,8 @@ export default function SettingsPanel({
           <div className="theme-grid">
             {THEMES.map((t) => (
               <button key={t.id} className={`theme-card ${theme === t.id ? 'active' : ''}`} onClick={() => onTheme(t.id)}>
-                <span className="theme-swatch" style={{ background: t.swatch[0] }}>
-                  <span />
+                <span className="theme-swatch">
+                  <i style={{ background: t.swatch[0] }} />
                   <i style={{ background: t.swatch[1] }} />
                 </span>
                 {t.label}
