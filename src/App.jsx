@@ -60,13 +60,24 @@ export default function App() {
   useEffect(() => { localStorage.setItem('vault:sidebarW', String(sidebarWidth)); }, [sidebarWidth]);
   useEffect(() => { localStorage.setItem('vault:detailW', String(detailWidth)); }, [detailWidth]);
 
-  // Dark mode
-  const [darkMode, setDarkMode] = useState(() => localStorage.getItem('vault:theme') === 'dark');
+  // Appearance
+  const [theme, setTheme] = useState(() => {
+    const saved = localStorage.getItem('vault:theme');
+    if (saved === 'dark') return 'blueprint-dark';
+    if (!saved || saved === 'light') return 'blueprint';
+    return saved;
+  });
+  const [showGrid, setShowGrid] = useState(() => localStorage.getItem('vault:grid') !== 'off');
 
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light');
-    localStorage.setItem('vault:theme', darkMode ? 'dark' : 'light');
-  }, [darkMode]);
+    document.documentElement.setAttribute('data-theme', theme === 'blueprint' ? 'light' : theme);
+    localStorage.setItem('vault:theme', theme);
+  }, [theme]);
+  useEffect(() => {
+    if (showGrid) document.documentElement.removeAttribute('data-grid');
+    else document.documentElement.setAttribute('data-grid', 'off');
+    localStorage.setItem('vault:grid', showGrid ? 'on' : 'off');
+  }, [showGrid]);
 
   // Folder tree UI state
   const [expandedFolders, setExpandedFolders] = useState(() => new Set());
@@ -728,8 +739,6 @@ export default function App() {
         onDragStartFolder={handleDragStartFolder}
         onDropUnsorted={handleDropUnsorted}
         onOpenSettings={() => setSettingsOpen(true)}
-        darkMode={darkMode}
-        onToggleDarkMode={() => setDarkMode((d) => !d)}
       />
       <ResizeHandle side="left" onResize={handleSidebarResize} />
       <Gallery
@@ -824,7 +833,16 @@ export default function App() {
       {progressOpen && jobs.length > 0 && (
         <ThumbProgress jobs={jobs} onClose={() => setProgressOpen(false)} onClear={() => { setJobs([]); setProgressOpen(false); }} />
       )}
-      {settingsOpen && <SettingsPanel onClose={() => setSettingsOpen(false)} />}
+      {settingsOpen && (
+        <SettingsPanel
+          onClose={() => setSettingsOpen(false)}
+          theme={theme} onTheme={setTheme}
+          showGrid={showGrid} onShowGrid={setShowGrid}
+          view={galleryView} onView={setGalleryView}
+          cardSize={cardSize} onCardSize={setCardSize}
+          onRetryAllThumbnails={() => { setSettingsOpen(false); retryFolderThumbnails(null); }}
+        />
+      )}
     </div>
   );
 }

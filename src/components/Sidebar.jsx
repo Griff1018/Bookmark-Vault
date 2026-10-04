@@ -13,7 +13,7 @@ export default function Sidebar({
   onCommitFolderDraft, onCancelFolderDraft,
   editingFolderId, dragOverFolderId, onDragOverFolder, onDragLeaveFolder,
   onDropOnFolder, onDragStartFolder, onDropUnsorted,
-  onOpenSettings, darkMode, onToggleDarkMode
+  onOpenSettings
 }) {
   return (
     <aside className="sidebar">
@@ -122,9 +122,6 @@ export default function Sidebar({
       <div className="sidebar-footer">
         <span>Bridge: 127.0.0.1:47564</span>
         <div style={{ display: 'flex', gap: 6 }}>
-          <button className="theme-toggle" title={darkMode ? 'Light mode' : 'Dark mode'} onClick={onToggleDarkMode}>
-            {darkMode ? '☀' : '☾'}
-          </button>
           <button className="settings-btn" title="Settings" onClick={onOpenSettings}>⚙</button>
         </div>
       </div>

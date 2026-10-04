@@ -1,6 +1,7 @@
 import React from 'react';
 import ViewToolbar from './ViewToolbar.jsx';
 import DetailsTable from './DetailsTable.jsx';
+import TiledRows from './TiledRows.jsx';
 import FolderTiles from './FolderTiles.jsx';
 import Breadcrumb from './Breadcrumb.jsx';
 import SearchFacets from './SearchFacets.jsx';
@@ -68,7 +69,7 @@ export default function Gallery({
             <option value="oldest">Oldest first</option>
             <option value="title">Title A–Z</option>
           </select>
-          {(view === 'large' || view === 'small') && (
+          {(view === 'large' || view === 'small' || view === 'rows') && (
             <div className="size-slider" title={`Card size: ${cardSize}px`}>
               <span className="size-slider-icon size-slider-icon--small">▪</span>
               <input
@@ -124,6 +125,18 @@ export default function Gallery({
             shouldBlur={shouldBlur}
             selectedIds={selectedIds}
             onSelect={onSelectItem}
+          />
+        ) : view === 'rows' ? (
+          <TiledRows
+            items={items}
+            rowHeight={cardSize}
+            onOpen={onOpen}
+            onContextMenu={onContextMenu}
+            onToggleFavorite={onToggleFavorite}
+            shouldBlur={shouldBlur}
+            selectedIds={selectedIds}
+            focusedIndex={focusedIndex}
+            onItemClick={handleItemClick}
           />
         ) : view === 'list' ? (
           <div className="list-view">

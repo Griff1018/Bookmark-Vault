@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 
 function thumbSrc(item) {
   if (!item.thumbnail_path) return null;
@@ -10,17 +11,35 @@ function faviconSrc(item) {
   return `vault-thumb://${encodeURIComponent(item.favicon_path)}`;
 }
 
+function formatDate(ts) {
+  if (!ts) return '—';
+  const d = new Date(ts);
+  const p = (n) => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+
 export default function DetailPanel({ item, onClose, onUpdate, onDelete, onOpenExternal, onToast }) {
   const [title, setTitle] = useState(item.title || '');
   const [notes, setNotes] = useState(item.notes || '');
   const [tagInput, setTagInput] = useState('');
   const [tags, setTags] = useState(item.tags || []);
+  const [dims, setDims] = useState(null);
+  const [zoomed, setZoomed] = useState(false);
 
   useEffect(() => {
     setTitle(item.title || '');
     setNotes(item.notes || '');
     setTags(item.tags || []);
+    setDims(null);
+    setZoomed(false);
   }, [item.id]);
+
+  useEffect(() => {
+    if (!zoomed) return undefined;
+    const onKey = (e) => { if (e.key === 'Escape') { e.stopPropagation(); setZoomed(false); } };
+    window.addEventListener('keydown', onKey, true);
+    return () => window.removeEventListener('keydown', onKey, true);
+  }, [zoomed]);
 
   function commit(patch) {
     onUpdate(item.id, patch);
@@ -48,69 +67,85 @@ export default function DetailPanel({ item, onClose, onUpdate, onDelete, onOpenE
   return (
     <aside className="detail-sidebar">
       <div className="detail-sidebar-header">
-        <span className="detail-sidebar-title">Details</span>
-        <button className="btn detail-close-btn" onClick={onClose}>✕</button>
+        <span className="detail-sidebar-title">DETAIL <i>/ {String(item.id).slice(0, 8)}</i></span>
+        <button className="btn detail-close-btn" onClick={onClose} title="Close">✕</button>
       </div>
 
       <div className="detail-sidebar-body">
-        <div className="detail-thumb-area">
-          {thumbSrc(item) ? (
-            <img src={thumbSrc(item)} alt="" />
-          ) : faviconSrc(item) ? (
-            <div className="detail-no-thumb favicon-fallback"><img src={faviconSrc(item)} alt="" /></div>
-          ) : (
-            <div className="detail-no-thumb">No thumbnail</div>
-          )}
-        </div>
+        <figure className="detail-figure">
+          <span className="tick tl" /><span className="tick tr" /><span className="tick bl" /><span className="tick br" />
+          <div className="detail-thumb-area">
+            {thumbSrc(item) ? (
+              <img
+                className="zoomable"
+                src={thumbSrc(item)}
+                alt=""
+                title="Click to enlarge"
+                onClick={() => setZoomed(true)}
+                onLoad={(e) => setDims(`${e.currentTarget.naturalWidth} × ${e.currentTarget.naturalHeight}`)}
+              />
+            ) : faviconSrc(item) ? (
+              <div className="detail-no-thumb favicon-fallback"><img src={faviconSrc(item)} alt="" /></div>
+            ) : (
+              <div className="detail-no-thumb">No thumbnail</div>
+            )}
+          </div>
+          {dims && <span className="detail-dim-tag">[{dims}]</span>}
+        </figure>
 
         <div className="detail-fields">
-          <div className="detail-field">
-            <div className="field-label">Title</div>
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              onBlur={() => commit({ title })}
-            />
+          <input
+            className="detail-title-input"
+            type="text"
+            value={title}
+            placeholder="Untitled"
+            onChange={(e) => setTitle(e.target.value)}
+            onBlur={() => commit({ title })}
+          />
+
+          <div className="detail-toolbar">
+            <button
+              className={`btn fav ${item.favorite ? 'active' : ''}`}
+              onClick={() => commit({ favorite: item.favorite ? 0 : 1 })}
+              title={item.favorite ? 'Remove from favorites' : 'Add to favorites'}
+            >♥</button>
+            <button className="btn primary" onClick={() => onOpenExternal(item.url)}>Open link</button>
+            <button className="btn danger" onClick={() => onDelete(item.id)}>Delete</button>
           </div>
 
-          <div className="detail-field">
-            <div className="field-label">URL</div>
-            <div className="detail-url" title={item.url}>{item.url}</div>
-          </div>
-
-          <div className="detail-field">
-            <div className="detail-fav-row">
-              <button
-                className={`heart-toggle ${item.favorite ? 'active' : ''}`}
-                onClick={() => commit({ favorite: item.favorite ? 0 : 1 })}
-                title="Favorite"
-              >♥</button>
-              <span className="detail-fav-label">{item.favorite ? 'Favorited' : 'Add to favorites'}</span>
+          <dl className="detail-specs">
+            <div className="spec">
+              <dt>Source</dt>
+              <dd>
+                {faviconSrc(item) && <img className="source-icon" src={faviconSrc(item)} alt="" />}
+                {item.source || '—'}
+              </dd>
             </div>
-          </div>
-
-          <div className="detail-field">
-            <div className="field-label">Source</div>
-            <div className="detail-source" style={{ fontSize: 12.5, color: 'var(--text-muted)', wordBreak: 'break-word' }}>
-              {faviconSrc(item) && <img className="source-icon" src={faviconSrc(item)} alt="" />}
-              {item.source || '—'}
+            <div className="spec">
+              <dt>Added</dt>
+              <dd>{formatDate(item.created_at)}</dd>
             </div>
-          </div>
+            <div className="spec">
+              <dt>URL</dt>
+              <dd className="url" title={item.url} onClick={() => onOpenExternal(item.url)}>{item.url}</dd>
+            </div>
+          </dl>
 
           <div className="detail-field">
             <div className="field-label">Tags</div>
-            <div className="tag-chip-row" style={{ marginBottom: 8 }}>
-              {tags.map((t) => (
-                <span className="tag-chip" key={t}>
-                  #{t}
-                  <button onClick={() => removeTag(t)}>✕</button>
-                </span>
-              ))}
-            </div>
+            {tags.length > 0 && (
+              <div className="tag-chip-row" style={{ marginBottom: 8 }}>
+                {tags.map((t) => (
+                  <span className="tag-chip" key={t}>
+                    #{t}
+                    <button onClick={() => removeTag(t)}>✕</button>
+                  </span>
+                ))}
+              </div>
+            )}
             <input
               type="text"
-              placeholder="Add tag, press Enter"
+              placeholder="add tag + enter"
               value={tagInput}
               onChange={(e) => setTagInput(e.target.value)}
               onKeyDown={addTag}
@@ -121,17 +156,21 @@ export default function DetailPanel({ item, onClose, onUpdate, onDelete, onOpenE
             <div className="field-label">Notes</div>
             <textarea
               value={notes}
+              placeholder="write something…"
               onChange={(e) => setNotes(e.target.value)}
               onBlur={() => commit({ notes })}
             />
           </div>
-
-          <div className="detail-actions">
-            <button className="btn primary" onClick={() => onOpenExternal(item.url)}>Open link</button>
-            <button className="btn danger" onClick={() => onDelete(item.id)}>Delete</button>
-          </div>
         </div>
       </div>
+      {zoomed && thumbSrc(item) && createPortal(
+        <div className="lightbox" onClick={() => setZoomed(false)}>
+          <button className="lightbox-close" onClick={() => setZoomed(false)} title="Close (Esc)">✕</button>
+          <img src={thumbSrc(item)} alt="" onClick={(e) => e.stopPropagation()} />
+          {dims && <span className="lightbox-dim">[{dims}]</span>}
+        </div>,
+        document.body
+      )}
     </aside>
   );
 }
